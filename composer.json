@@ -1,0 +1,17 @@
+{
+    "require": {
+        "slim/slim": "^4.0",
+        "slim/psr7": "^1.0",
+        "coffeecode/datalayer": "2.0.*",
+        "ramsey/uuid": "^4.9"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^9.0"
+    },
+    "autoload": {
+        "files": [
+            "Source/Config.php",
+            "Model/Jogos.php"
+        ]
+    }
+}
