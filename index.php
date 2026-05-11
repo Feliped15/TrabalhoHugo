@@ -18,7 +18,7 @@ if ($basePath !== '/' && $basePath !== '\\' && $basePath !== '.') {
 $app->get('/', function (Request $request, Response $response) {
     $response->getBody()->write(json_encode([
         'message' => 'API is running',
-        'routes' => ['/jogos', '/jogos/{id}', '/jogos (POST)', '/jogos/{id} (PUT)', '/jogos/{id} (DELETE)']
+        'routes' => ['/login', '/jogos', '/jogos/{id}', '/jogos (POST)', '/jogos/{id} (PUT)', '/jogos/{id} (DELETE)']
     ]));
     return $response->withHeader('Content-Type', 'application/json');
 });
@@ -55,6 +55,12 @@ $app->get('/jogos', function (Request $request, Response $response, $args) {
     $data = $jogos->find()->fetch(true);
 
     $jogos= null;
+
+    if ($data === null) {
+        $response->getBody()->write(json_encode([]));
+        return $response->withHeader('Content-Type', 'application/json');
+    }
+
     foreach ($data as $item) {
         $jogo = [
             "id" => $item->id,
@@ -216,6 +222,6 @@ $app->delete('/jogos/{id}', function (Request $request, Response $response, $arg
     return $response->withHeader('Content-Type', 'application/json')->withStatus(204);
 });
 
-// Run app
+
 $app->run();
 ?>
