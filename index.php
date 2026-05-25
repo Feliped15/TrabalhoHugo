@@ -4,6 +4,7 @@ require_once './vendor/autoload.php';
 use Slim\Factory\AppFactory;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
+use Psr\Http\Server\RequestHandlerInterface;
 use Model\Jogos;
 use Ramsey\Uuid\Uuid;
 
@@ -14,6 +15,41 @@ $basePath = dirname($scriptName);
 if ($basePath !== '/' && $basePath !== '\\' && $basePath !== '.') {
     $app->setBasePath($basePath);
 }
+
+$allowedOrigins = ['https://snack-runtime.eascdn.net'];
+
+$app->options('/{routes:.+}', function (Request $request, Response $response) use ($allowedOrigins): Response {
+    $origin = $request->getHeaderLine('Origin');
+    // $origin = "*"; Comenta o if e comenta a linha 22 e a linha 31
+
+    if (!in_array($origin, $allowedOrigins, true)) {
+        return $response->withStatus(204);
+    }
+
+    return $response
+        ->withHeader('Access-Control-Allow-Origin', $origin)
+        ->withHeader('Vary', 'Origin')
+        ->withHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With')
+        ->withHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
+        ->withHeader('Access-Control-Allow-Credentials', 'true');
+});
+
+$app->add(function (Request $request, RequestHandlerInterface $handler) use ($allowedOrigins) {
+    $origin = $request->getHeaderLine('Origin');
+    $response = $handler->handle($request);
+    // $origin = "*"; Comenta o if e comenta a linha 38 e a linha 48
+
+    if (!in_array($origin, $allowedOrigins, true)) {
+        return $response;
+    }
+
+    return $response
+        ->withHeader('Access-Control-Allow-Origin', $origin)
+        ->withHeader('Vary', 'Origin')
+        ->withHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With')
+        ->withHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
+        ->withHeader('Access-Control-Allow-Credentials', 'true');
+});
 
 $app->get('/', function (Request $request, Response $response) {
     $response->getBody()->write(json_encode([
